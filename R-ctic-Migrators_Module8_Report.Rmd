@@ -1,0 +1,96 @@
+---
+title: "Effects of Weather on Trans-Gulf Migrant Arrival Times in Massachusetts"
+author: "Jonah, Julia, Nicole, Conor"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: html_document
+bibliography: BIOL3140.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rgbif)
+library(rnoaa)
+library(tidyverse)
+library(lme4)
+library(MuMIn)
+library(ggplot2)
+library(usmap)
+# Other libraries you might need
+```
+
+# Introduction
+Trans-Gulf migrants (TGMs), a group of neotropical passerines, face significant challenges due to climate change, particularly in their migration patterns. This study aims to analyze the impact of local weather conditions on the arrival times of TGMs in Massachusetts, using data from eBird and meteorological sources. [Add more background and the importance of this study].
+
+# Methods
+Species Selection
+Five species of TGMs were selected for this study: [List the species]. The criteria for selection included [mention the criteria].
+
+# Data Collection
+
+## eBird Data
+
+```{r GBIF, include=TRUE}
+## R code to query GBIF API for eBird data
+
+#Example:
+# raven_data <- occ_data(scientificName = "Corvus corax", 
+#                        stateProvince="Maine", limit=200, year=2018)
+# [Continue with the actual code for our data]
+```
+
+## Weather Data
+```{r weather, include=TRUE}
+# R code to query NOAA API for weather data
+
+# Example:
+# weather_data <- ncdc_stations(stationid = "GHCND:USW00014739")
+# [Continue with the actual code for our data]
+
+
+```
+
+
+# Data Analysis
+
+## Preprocessing
+```{r preproc, include=TRUE}
+# Data cleaning and preparation steps
+```
+
+## eBird Data Analysis
+```{r birdanaly, include=TRUE}
+# Logistic modeling and other analysis
+```
+
+## Weather Data Analysis
+```{r weatheranaly, include=TRUE}
+# Analysis correlating weather data with bird arrival data
+```
+
+# Linear Mixed-Effect Modeling
+```{r lme, include=TRUE}
+# Building and testing the linear mixed-effect models
+```
+
+# Results
+
+[Present the findings with appropriate visualizations. Use ggplot2 or other plotting libraries to create graphs.]
+
+# Discussion
+
+Discuss the implications of our findings in relation to climate change and its impact on TGMs. Compare our results with existing literature.
+
+# Author Contributions
+
+- Jonah
+- Julia
+- Nicole
+- Conor
+
+# References
+
+[Ensure all references are correctly cited and included in the BIOL3140.bib file]
+
+
+
+
