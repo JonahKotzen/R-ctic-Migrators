@@ -15,7 +15,7 @@ library(lme4)
 library(MuMIn)
 library(ggplot2)
 library(usmap)
-# Other libraries you might need
+# Insert other libraries we might need
 ```
 
 # Introduction
