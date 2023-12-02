@@ -19,11 +19,30 @@ library(usmap)
 ```
 
 # Introduction
-Trans-Gulf migrants (TGMs), a group of neotropical passerines, face significant challenges due to climate change, particularly in their migration patterns. This study aims to analyze the impact of local weather conditions on the arrival times of TGMs in Massachusetts, using data from eBird and meteorological sources. [Add more background and the importance of this study].
+Trans-Gulf migrants (TGMs), a group of neotropical passerines, face significant challenges due to climate change, particularly in their migration patterns. Even though it may not seem like climate change affects TGMs to a large extent, when discussing migration and breeding it affects the passerines immensely. The date when any individual migrant arrives on its breeding grounds has important fitness consequences and the evolution of this phenological event is likely the result of balancing important tradeoffs. Arriving early increases the chances of finding a mate and breeding multiple times, whereas later arrival ensures higher food availability in these temperate and seasonal ecosystems. @smith2005arrival In the context of a changing climate, failure of TGMs to shift arrival date at breeding areas in response to warmer spring temperatures may result in population declines. @both2006climate
+
+For this reason studying the components of migration of TGMs will bring more information on arrival time with meteorological conditions affects of climate change. "We argue that a renewed effort in research on short- and long-distance bird migration within the Neotropics will allow (1) comparative studies that identify the emergent properties of migratory behavior, (2) identification of the convergent or unique mechanistic drivers of migration across diverse ecological settings, (3) formulation of effective conservation and management plans for migratory Neotropical birds, and (4) predictions about how migratory birds will respond to large-scale climatic changes within the Neotropics." @jahn2020bird
+
+This study aims to analyze the impact of local weather conditions on the arrival times of TGMs in Massachusetts, using data from eBird and meteorological sources. 
 
 # Methods
-Species Selection
-Five species of TGMs were selected for this study: [List the species]. The criteria for selection included [mention the criteria].
+
+### Species Selection
+
+Five species of TGMs were selected for this study. Once the five species were chosen, we downloaded the occurrence data for the species through the occ_data() function from rgbif. 
+
+### Querying GBIF's API 
+
+### Querying NOAA's NCDC API 
+
+Since we are studying TGMs we analyzed weather along the migration route in terms of weather parameters, locations, and time frames that we complied data from. NOAA's NCDC identifies weather station by unique ID codes. Before using rnoaa to access NOAA's NCDC API, we established a key, a token, that identifies the user and establishes a connection to the NCDC servers. Then we set global parameter values for our data collection. Finally, we queried the NCDC API to retrieve exact locations. We then prepared the data for mapping. 
+
+### Linear Mixed-effect Modeling 
+
+Since we have a rather complicated data set, including parameters that we consider important and explanatory (contribute to the slope and intercept of the model) we have some groups within our data set that have differing slopes and intercepts. However, for this project, our concern is how the fixed effects of temperature and wind vectors explain arrival and are in accordance with the fact that the location of weather variables (a random effect) may contribute differently to the relationship. 
+
+(In subsequent analysis, we would also consider species as a random effect, allowing the response of arrival time may vary according to species).
+
 
 # Data Collection
 
@@ -83,13 +102,12 @@ Discuss the implications of our findings in relation to climate change and its i
 # Author Contributions
 
 - Jonah
-- Julia
+- Julia: Wrote Introduction, and cited three papers included in Introduction. Wrote the Methods section. 
 - Nicole
 - Conor
 
 # References
 
-[Ensure all references are correctly cited and included in the BIOL3140.bib file]
 
 
 
