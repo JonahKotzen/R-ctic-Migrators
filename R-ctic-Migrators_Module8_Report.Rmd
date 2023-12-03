@@ -9,13 +9,17 @@ bibliography: BIOL3140.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(rgbif)
-library(rnoaa)
 library(tidyverse)
-library(lme4)
 library(MuMIn)
-library(ggplot2)
+library(rnoaa)
+library(data.table)
+library(ggmap)
 library(usmap)
-# Insert other libraries we might need
+library(magick)#for examples
+library(cowplot)#for examples
+library(lme4) #for linear mixed effect models
+library(car) #for LME anova testing
+library(data.table) #for frollmean function (and others)
 ```
 
 # Introduction
@@ -29,67 +33,86 @@ This study aims to analyze the impact of local weather conditions on the arrival
 
 ### Species Selection
 
-Five species of TGMs were selected for this study. Once the five species were chosen, we downloaded the occurrence data for the species through the occ_data() function from rgbif. 
+Five species of TGMs ("Sphyrapicus varius", "Antrostomus vociferus", "Vireo philadelphicus", "Petrochelidon pyrrhonota", "Setophaga cerulea) were selected for this study. Once the five species were chosen, we downloaded the occurrence data for the species through the occ_data() function from rgbif. 
 
-### Querying GBIF's API 
+```{r}
+# List of species
+species_list <- c("Sphyrapicus varius", "Antrostomus vociferus", "Vireo philadelphicus", "Petrochelidon pyrrhonota", "Setophaga cerulea")
 
-### Querying NOAA's NCDC API 
+# Data compilation and analysis loop
+dat_l <- list()
+models_lmer <- list()
+models_lmer2 <- list()
 
-Since we are studying TGMs we analyzed weather along the migration route in terms of weather parameters, locations, and time frames that we complied data from. NOAA's NCDC identifies weather station by unique ID codes. Before using rnoaa to access NOAA's NCDC API, we established a key, a token, that identifies the user and establishes a connection to the NCDC servers. Then we set global parameter values for our data collection. Finally, we queried the NCDC API to retrieve exact locations. We then prepared the data for mapping. 
+for (s in species_list) {
+  
+  # Occurrence data retrieval
+  n_obs <- occ_data(scientificName = s, year = paste0("2000", ",", "2019"), month = paste0("4", ",", "5"), limit = 0, country = "US", basisOfRecord = "HUMAN_OBSERVATION", stateProvince = "Massachusetts")$meta$count
+  
+  dat_l[[s]] <- occ_data(scientificName = s, year = paste0("2000", ",", "2019"), month = paste0("4", ",", "5"), limit = n_obs, country = "US", basisOfRecord = "HUMAN_OBSERVATION", stateProvince = "Massachusetts")[[2]]
+  
+  # Logistic modeling
+  mc <- dat_l[[s]] %>%
+    group_by(year) %>%
+    mutate(
+      date = as.Date(paste0(year, "-", month, "-", day)),
+      j.day = julian(date, origin = as.Date(paste0(unique(year), "-01-01")))
+    ) %>%
+    group_by(species, year, j.day, date) %>%
+    summarise(day.tot = sum(individualCount, na.rm = TRUE)) %>%
+    group_by(species, year) %>%
+    mutate(prop = cumsum(day.tot / sum(day.tot, na.rm = TRUE))) %>%
+    filter(year > 1999)
+  
+  mc.pred <- mc %>%
+    group_by(year) %>%
+    summarize(
+      pred = predict(nls(prop ~ SSlogis(j.day, Asym, xmid, scal)), newdata = data.frame(j.day = min(mc$j.day):max(mc$j.day))),
+      j.day = min(mc$j.day):max(mc$j.day)
+    ) %>%
+    left_join(mc %>% dplyr::select(j.day, date))
+  
+  # Weather data operations
+  weather.d <- meteo_pull_monitors(sta.d$id, date_min = "2000-01-01")
+  mc.arr.weath <- mc.arrive.date %>%
+    left_join(weather.d) %>%
+    left_join(mc %>% dplyr::select(year, date, j.day))
+  
+  weather.wk <- weather.d %>%
+    group_by(year, name) %>%
+    mutate(
+      wk.tmin = frollmean(tmin, n = 14, align = "right"),
+      wk.tmax = frollmean(tmax, n = 14, align = "right"),
+      wk.wvec = frollmean(wvec, n = 14, align = "right")
+    ) %>%
+    dplyr::select(j.day, date2, name, wk.tmin, wk.tmax, wk.wvec)
+  
+  mc.arr.weath2 <- mc.arrive.date %>%
+    left_join(weather.wk)
+  
+  # Linear mixed-effect modeling
+  lmer_model <- lmer(j.day ~ wk.tmin * wk.tmax * wk.wvec + (1|name), mc.arr.weath2, na.action = "na.fail")
+  lmer_model2 <- lmer(j.day ~ wk.tmin + wk.tmax + wk.wvec + (1|name), mc.arr.weath2, na.action = "na.fail")
+  
+  models_lmer[[s]] <- lmer_model
+  models_lmer2[[s]] <- lmer_model2
+}
 
-### Linear Mixed-effect Modeling 
+# Model testing and Anova testing
+aic_list <- list()
 
-Since we have a rather complicated data set, including parameters that we consider important and explanatory (contribute to the slope and intercept of the model) we have some groups within our data set that have differing slopes and intercepts. However, for this project, our concern is how the fixed effects of temperature and wind vectors explain arrival and are in accordance with the fact that the location of weather variables (a random effect) may contribute differently to the relationship. 
+for (i in seq_along(species_list)) {
+  mc.arr.aic <- dredge(models_lmer2[[i]], fixed = c("wk.tmin", "wk.tmax", "wk.wvec"))
+  aic_list[[species_list[i]]] <- mc.arr.aic
+}
 
-(In subsequent analysis, we would also consider species as a random effect, allowing the response of arrival time may vary according to species).
-
-
-# Data Collection
-
-## eBird Data
-
-```{r GBIF, include=TRUE}
-## R code to query GBIF API for eBird data
-
-#Example:
-# raven_data <- occ_data(scientificName = "Corvus corax", 
-#                        stateProvince="Maine", limit=200, year=2018)
-# [Continue with the actual code for our data]
+# Display AIC values in a table
+for (i in seq_along(species_list)) {
+  cat("\nAIC values for", species_list[i], ":\n")
+  print(kable(aic_list[[species_list[i]]][1:4, ], caption = paste("Fit values for nested models of", species_list[i], "lme model")))
+}
 ```
 
-## Weather Data
-```{r weather, include=TRUE}
-# R code to query NOAA API for weather data
-
-# Example:
-# weather_data <- ncdc_stations(stationid = "GHCND:USW00014739")
-# [Continue with the actual code for our data]
-
-
-```
-
-
-# Data Analysis
-
-## Preprocessing
-```{r preproc, include=TRUE}
-# Data cleaning and preparation steps
-```
-
-## eBird Data Analysis
-```{r birdanaly, include=TRUE}
-# Logistic modeling and other analysis
-```
-
-## Weather Data Analysis
-```{r weatheranaly, include=TRUE}
-# Analysis correlating weather data with bird arrival data
-```
-
-# Linear Mixed-Effect Modeling
-```{r lme, include=TRUE}
-# Building and testing the linear mixed-effect models
-```
 
 # Results
 
@@ -104,7 +127,7 @@ Discuss the implications of our findings in relation to climate change and its i
 - Jonah
 - Julia: Wrote Introduction, and cited three papers included in Introduction. Wrote the Methods section. 
 - Nicole
-- Conor
+- Conor: Contributed to data analysis & wrote Discussion section.
 
 # References
 
