@@ -23,6 +23,7 @@ library(data.table) #for frollmean function (and others)
 ```
 
 # Introduction
+
 Trans-Gulf migrants (TGMs), a group of neotropical passerines, face significant challenges due to climate change, particularly in their migration patterns. Even though it may not seem like climate change affects TGMs to a large extent, when discussing migration and breeding it affects the passerines immensely. The date when any individual migrant arrives on its breeding grounds has important fitness consequences and the evolution of this phenological event is likely the result of balancing important tradeoffs. Arriving early increases the chances of finding a mate and breeding multiple times, whereas later arrival ensures higher food availability in these temperate and seasonal ecosystems. @smith2005arrival In the context of a changing climate, failure of TGMs to shift arrival date at breeding areas in response to warmer spring temperatures may result in population declines. @both2006climate
 
 For this reason studying the components of migration of TGMs will bring more information on arrival time with meteorological conditions affects of climate change. "We argue that a renewed effort in research on short- and long-distance bird migration within the Neotropics will allow (1) comparative studies that identify the emergent properties of migratory behavior, (2) identification of the convergent or unique mechanistic drivers of migration across diverse ecological settings, (3) formulation of effective conservation and management plans for migratory Neotropical birds, and (4) predictions about how migratory birds will respond to large-scale climatic changes within the Neotropics." @jahn2020bird
@@ -50,85 +51,6 @@ Since we have a rather complicated data set, including parameters that we consid
 ### Species Selection
 
 Five species of TGMs ("Sphyrapicus varius", "Antrostomus vociferus", "Vireo philadelphicus", "Petrochelidon pyrrhonota", "Setophaga cerulea) were selected for this study. Once the five species were chosen, we downloaded the occurrence data for the species through the occ_data() function from rgbif. 
-
-```{r}
-# List of species
-species_list <- c("Sphyrapicus varius", "Antrostomus vociferus", "Vireo philadelphicus", "Petrochelidon pyrrhonota", "Setophaga cerulea")
-
-# Data compilation and analysis loop
-dat_l <- list()
-models_lmer <- list()
-models_lmer2 <- list()
-
-for (s in species_list) {
-  
-  # Occurrence data retrieval
-  n_obs <- occ_data(scientificName = s, year = paste0("2000", ",", "2019"), month = paste0("4", ",", "5"), limit = 0, country = "US", basisOfRecord = "HUMAN_OBSERVATION", stateProvince = "Massachusetts")$meta$count
-  
-  dat_l[[s]] <- occ_data(scientificName = s, year = paste0("2000", ",", "2019"), month = paste0("4", ",", "5"), limit = n_obs, country = "US", basisOfRecord = "HUMAN_OBSERVATION", stateProvince = "Massachusetts")[[2]]
-  
-  # Logistic modeling
-  mc <- dat_l[[s]] %>%
-    group_by(year) %>%
-    mutate(
-      date = as.Date(paste0(year, "-", month, "-", day)),
-      j.day = julian(date, origin = as.Date(paste0(unique(year), "-01-01")))
-    ) %>%
-    group_by(species, year, j.day, date) %>%
-    summarise(day.tot = sum(individualCount, na.rm = TRUE)) %>%
-    group_by(species, year) %>%
-    mutate(prop = cumsum(day.tot / sum(day.tot, na.rm = TRUE))) %>%
-    filter(year > 1999)
-  
-  mc.pred <- mc %>%
-    group_by(year) %>%
-    summarize(
-      pred = predict(nls(prop ~ SSlogis(j.day, Asym, xmid, scal)), newdata = data.frame(j.day = min(mc$j.day):max(mc$j.day))),
-      j.day = min(mc$j.day):max(mc$j.day)
-    ) %>%
-    left_join(mc %>% dplyr::select(j.day, date))
-  
-  # Weather data operations
-  weather.d <- meteo_pull_monitors(sta.d$id, date_min = "2000-01-01")
-  mc.arr.weath <- mc.arrive.date %>%
-    left_join(weather.d) %>%
-    left_join(mc %>% dplyr::select(year, date, j.day))
-  
-  weather.wk <- weather.d %>%
-    group_by(year, name) %>%
-    mutate(
-      wk.tmin = frollmean(tmin, n = 14, align = "right"),
-      wk.tmax = frollmean(tmax, n = 14, align = "right"),
-      wk.wvec = frollmean(wvec, n = 14, align = "right")
-    ) %>%
-    dplyr::select(j.day, date2, name, wk.tmin, wk.tmax, wk.wvec)
-  
-  mc.arr.weath2 <- mc.arrive.date %>%
-    left_join(weather.wk)
-  
-  # Linear mixed-effect modeling
-  lmer_model <- lmer(j.day ~ wk.tmin * wk.tmax * wk.wvec + (1|name), mc.arr.weath2, na.action = "na.fail")
-  lmer_model2 <- lmer(j.day ~ wk.tmin + wk.tmax + wk.wvec + (1|name), mc.arr.weath2, na.action = "na.fail")
-  
-  models_lmer[[s]] <- lmer_model
-  models_lmer2[[s]] <- lmer_model2
-}
-
-# Model testing and Anova testing
-aic_list <- list()
-
-for (i in seq_along(species_list)) {
-  mc.arr.aic <- dredge(models_lmer2[[i]], fixed = c("wk.tmin", "wk.tmax", "wk.wvec"))
-  aic_list[[species_list[i]]] <- mc.arr.aic
-}
-
-# Display AIC values in a table
-for (i in seq_along(species_list)) {
-  cat("\nAIC values for", species_list[i], ":\n")
-  print(kable(aic_list[[species_list[i]]][1:4, ], caption = paste("Fit values for nested models of", species_list[i], "lme model")))
-}
-```
-
 
 # Results
 
@@ -297,8 +219,3 @@ Discuss the implications of our findings in relation to climate change and its i
 - Conor: Contributed to data analysis & wrote Discussion section.
 
 # References
-
-
-
-
-
