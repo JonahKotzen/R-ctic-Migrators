@@ -208,6 +208,17 @@ Our analysis revealed significant variations in the arrival times of Trans-Gulf 
 
 ## Discussion
 
+### Relating Results to the Research Questions
+Our study unequivocally demonstrates that arrival times of Trans-Gulf migrants (TGMs) in Massachusetts vary significantly based on temperature and wind variables along their migration route. The linear mixed-effect modeling establishes a robust correlation between meteorological conditions and arrival timing, supporting the tradeoffs outlined in our introduction regarding mate finding and food availability.
+
+### Comparison to Previous Work
+In comparison to previous work, particularly Smith @smith2005arrival, our study aligns with the emphasis on the importance of arrival dates and their fitness consequences. However, our analysis goes beyond by incorporating wind vectors, providing a more comprehensive understanding of the factors influencing TGM arrival times. This nuanced approach resonates with Jahn @jahn2020bird call for renewed research efforts in studying bird migration within the Neotropics.
+
+### Importance of Findings to the Broader Topic
+Our findings carry significant implications for the broader topics of avian migration, climate change, and biodiversity conservation. The observed correlation between arrival times and meteorological conditions highlights the vulnerability of TGM populations to climate change. As the world faces unprecedented climate challenges, our study underscores the need for adaptive conservation strategies to ensure the persistence of migratory bird species in the Neotropics.
+
+In conclusion, our research not only advances the understanding of TGM migration dynamics but also contributes crucial insights to the broader discourse on climate change impacts on avian biodiversity. The urgency of proactive conservation measures is emphasized, aligning with the overarching goal of preserving the delicate ecological balance in the Neotropics.
+
 ### Arrival Time Variation and Meteorological Conditions
 
 The results indicate that arrival times of TGMs in Massachusetts are influenced by temperature and wind variables along their migration route. Warmer spring temperatures may incentivize earlier arrivals, increasing the likelihood of successful mate finding and multiple breeding events. Conversely, wind vectors play a role in shaping arrival patterns, with favorable winds potentially expediting or delaying migration.
