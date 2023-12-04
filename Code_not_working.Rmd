@@ -210,7 +210,7 @@ Discuss the implications of our findings in relation to climate change and its i
 
 # Author Contributions
 
-- Jonah: Created the backbone of the projected. 
+- Jonah: Created the backbone of the project. 
 - Julia: Wrote Introduction, and cited three papers included in Introduction. Wrote the Methods section. 
 - Nicole
 - Conor: Contributed to data analysis & wrote Discussion section.
