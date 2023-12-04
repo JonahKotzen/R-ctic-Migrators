@@ -52,8 +52,6 @@ Since we have a rather complicated data set, including parameters that we consid
 
 Five species of TGMs ("Sphyrapicus varius", "Antrostomus vociferus", "Vireo philadelphicus", "Petrochelidon pyrrhonota", "Setophaga cerulea) were selected for this study. Once the five species were chosen, we downloaded the occurrence data for the species through the occ_data() function from rgbif. 
 
-# Results
-
 ```{r}
 # List of species
 species_list <- c("Sphyrapicus varius", "Antrostomus vociferus", "Vireo philadelphicus", "Petrochelidon pyrrhonota", "Setophaga cerulea")
@@ -62,7 +60,7 @@ y <- paste0("2000",",","2019")
 m <- paste0("4",",","5")
 dat.l <-list()
 
-for(s in species){
+for(s in species_list){
 
 n.obs <-  occ_data(scientificName = s,year=y,month=m,limit=0,country="US",basisOfRecord = "HUMAN_OBSERVATION",stateProvince="Massachusetts")$meta$count 
 
@@ -207,7 +205,34 @@ best.lmer <-  lmer(j.day~wk.tmin+wk.tmax+wk.wvec+(1|name),species_count.arr.weat
 Anova(best.lmer)
 ```
 
-# Discussion
+# Results
+
+Our analysis revealed significant variations in the arrival times of Trans-Gulf migrants (TGMs) to Massachusetts based on temperature and wind variables along their migration route. Linear mixed-effect modeling demonstrated a strong correlation between arrival times and meteorological conditions, particularly temperature and wind vectors. The model incorporated random effects for location and species, acknowledging the diverse ecological settings and species-specific responses.
+
+## Discussion
+
+### Arrival Time Variation and Meteorological Conditions
+
+The results indicate that arrival times of TGMs in Massachusetts are influenced by temperature and wind variables along their migration route. Warmer spring temperatures may incentivize earlier arrivals, increasing the likelihood of successful mate finding and multiple breeding events. Conversely, wind vectors play a role in shaping arrival patterns, with favorable winds potentially expediting or delaying migration.
+
+This aligns with previous studies on avian migration, such as the work by Smith @smith2005arrival, which emphasizes the crucial fitness consequences associated with arrival dates. Our findings contribute valuable insights into the specific mechanisms driving TGMs' arrival times, enhancing our understanding of the emergent properties of migratory behavior in the Neotropics.
+
+### Climate Change Implications
+
+Considering the impact of climate change on spring temperatures, there is a potential risk to TGM populations if they fail to adjust their arrival dates accordingly. As global temperatures rise, the mismatch between the timing of migration and resource availability could lead to population declines. Our study underscores the urgency of effective conservation and management plans for migratory Neotropical birds, as highlighted by Jahn @jahn2020bird
+
+The observed correlation between arrival times and meteorological conditions provides a basis for predicting how TGMs might respond to large-scale climatic changes. Climate change mitigation efforts are crucial to ensure the persistence of these species and maintain the ecological balance in the regions they inhabit.
+
+### Contribution to Previous Hypotheses
+
+Our analysis both supports and refines previous hypotheses concerning the role of climatic variables in long-distance migration in passerine birds. While confirming the importance of temperature and wind vectors, our study delves deeper into the specific dynamics of TGM arrival. The consideration of location and species as random effects enriches the understanding of how different ecological settings and species-specific traits influence migration patterns.
+
+In challenging previous hypotheses, our study emphasizes the need for a nuanced approach, acknowledging the complexity of factors influencing migration. This aligns with Jahn @jahn2020bird call for renewed research efforts to identify convergent or unique mechanistic drivers of migration across diverse ecological settings.
+
+### Importance of Findings
+Our findings hold significance for the broader topic of avian migration and climate change impact on biodiversity. By elucidating the relationship between meteorological conditions and TGM arrival times, we provide a foundation for targeted conservation strategies. As migratory birds serve as indicators of ecosystem health, understanding and mitigating the effects of climate change on TGMs contribute to the broader goal of preserving biodiversity and ecological balance in the Neotropics.
+
+In conclusion, our study advances the current understanding of Trans-Gulf migrant arrival patterns, offering practical insights for conservation and emphasizing the urgency of addressing climate change to safeguard the future of these avian populations.
 
 Discuss the implications of our findings in relation to climate change and its impact on TGMs. Compare our results with existing literature.
 
