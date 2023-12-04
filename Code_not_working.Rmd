@@ -62,7 +62,7 @@ y <- paste0("2000",",","2019")
 m <- paste0("4",",","5")
 dat.l <-list()
 
-for(s in species){
+for(s in species_list){
 
 n.obs <-  occ_data(scientificName = s,year=y,month=m,limit=0,country="US",basisOfRecord = "HUMAN_OBSERVATION",stateProvince="Massachusetts")$meta$count 
 
@@ -213,7 +213,7 @@ Discuss the implications of our findings in relation to climate change and its i
 
 # Author Contributions
 
-- Jonah
+- Jonah: Created the backbone of the projected. 
 - Julia: Wrote Introduction, and cited three papers included in Introduction. Wrote the Methods section. 
 - Nicole
 - Conor: Contributed to data analysis & wrote Discussion section.
